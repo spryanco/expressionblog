@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Simple Blog</title>
+    <meta charset="utf-8">
+ 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+ 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+ 	
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+    <nav class="navbar navbar-expand navbar-dark" style="background-color: #3f2c61;">
+        <div class="container">
+            <a class="navbar-brand" href="#">Simple Blog</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                  {if logged_in}
+                    <li class="nav-item mr-2">
+                    <a class="btn btn-light" href="{path='member'}/{logged_in_member_id}">View Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a role="button" href="{path='logout'}" class="btn btn-danger">Logout</a>
+                    </li>
+                  {/if}
+                  {if logged_out}
+                    <li class="nav-item mr-2">
+                        <a class="btn btn-light" href="{path='member/login'}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-light" href="{path='member/register'}">Register</a>
+                    </li>
+                  {/if}
+                </ul>
+        </div>
+        </div>
+    </nav>

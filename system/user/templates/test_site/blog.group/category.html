@@ -1,0 +1,39 @@
+{embed="site/_header"}
+<body>
+    <main>
+        <section class="jumbotron jumbotron-fluid text-center">
+            <h1 class="text-center font-weight-light">Simple Expression Engine Blog</h1>
+        </section>
+        <div class="container mt-1 mb-5">
+            <br>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="{path='SITE_INDEX'}">Home</a></li>
+                  <li class="breadcrumb-item">Categories</li>
+                  <li class="breadcrumb-item active" aria-current="page">
+                    {exp:channel:category_heading}
+                        {category_name}
+                    {/exp:channel:category_heading}
+                  </li>
+                </ol>
+            </nav>
+            {exp:channel:entries channel="blog"}
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <a href="/ee/blog/{url_title}"><h3>{title}</h3></a>
+                        Posted: {entry_date format="%M %d, %Y"}
+                        By: {author}
+                    </div>
+                    <div class="card-body">
+                        {exp:excerpt words="100"}
+                            {post}
+                        {/exp:excerpt}
+                        <br>
+                    </div>
+                </div>
+            {/exp:channel:entries}
+        </div>
+    </main>
+    {embed="site/_footer"}
+</body>
+
