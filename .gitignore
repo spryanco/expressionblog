@@ -6,3 +6,6 @@
 /system/user/config
 /system/user/language
 .htaccess
+admin.php
+index.php
+LICENSE.txt
