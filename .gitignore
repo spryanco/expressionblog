@@ -1,1 +1,8 @@
 /images
+/themes
+/system/ee
+/system/user/addons
+/system/user/cache
+/system/user/config
+/system/user/language
+.htaccess
