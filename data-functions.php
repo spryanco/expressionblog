@@ -1,32 +1,38 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+session_start();
 //mailing list data capture functions
-
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     //Sanitize strings to prevent SQL injection
-    $name = filter_var($_POST["user-firstname"], FILTER_SANITIZE_STRING);
-    $surname = filter_var($_POST["user-surname"], FILTER_SANITIZE_STRING);
-    $email = filter_var($_POST["user-email"], FILTER_SANITIZE_STRING);
+    $name = $_POST["user-firstname"];
+    $surname = $_POST["user-surname"];
+    $email = $_POST["user-email"];
+    
+
+    //Sanitize strings to prevent SQL injection
+    $name = filter_var($name, FILTER_SANITIZE_STRING);
+    $surname = filter_var($surname, FILTER_SANITIZE_STRING);
+    $email = filter_var($email, FILTER_SANITIZE_STRING);
 
     //Double existing entry validation incase Bootstrap fails
     if(empty($name)) {
-        die("Please provide your name.");
+        error_msg("Please provide your name.");
     }
 
     if(empty($surname)) {
-        die("Please provide your surname.");
+        error_msg("Please provide your surname.");
     }
 
     //Also double check email is a valid email format
     if(empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        die("Please provide your email address.");
+        error_msg("Please provide your email address.");
     }
 
     $mysqli = connect();
 
     if($mysqli->connect_error) {
-        die("Error Occured - Connection: " . $mysqli->connect_error);
+        error_msg("Database Error: " .$mysqli->connect_error);
     }
 
     // ~~ send email confirmation (double opt-in) ~~
@@ -42,59 +48,43 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         //todo: actually return responses 
 
         if($statement->execute()) {
-            print "success";
-
             //send confirmation email
-            sendConfirmEmail($email, $confirmation_key);
+            send_confirm_mail($email, $confirmation_key);
         } else {
-            print "error";
-            die("Error Occured: " . $mysqli->error);
+            error_msg("Database Error: " . $mysqli->error);
         }
     } else {
-        print "error";
-        die("Error Occured: " . $mysqli->error);
+        error_msg("Database Error: " . $mysqli->error);
     }
+}
+
+function error_msg($msg) {
+    $_SESSION["RESPONSE"] = "register-failed";
+    $_SESSION["ERROR_MSG"] = $msg;
+    header('Location: /ee/');
+    die();
 }
 
 function send_confirm_mail($email, $confirmation_key) {
+    $mail_subject = 'Confirm Your Email';
     
-}
+    $mail_msg = "
 
-//todo: move this to confirm.php & provide link in email
-function confirm() {
-    if(empty($_GET['email']) || empty($_GET['key'])) {
-        //confirm both strings parsed to our confirmation
-        
-        die();
-    }
+    Thanks for signing up for our mailing list.
 
-    $email = mysql_real_escape_string($_GET['email']);
-    $key = mysql_real_escape_string($_GET['key']);
+    Please click this link to verify your email address:
+    http://localhost/ee/confirm.php?email=" . $email . "&key=" . $confirmation_key
+    . "
+    Not you? Click this link to cancel this registration:
+    http://localhost/ee/cancel.php?email=" . $email . "&key=" . $confirmation_key;
+    
+    $mail_headers = 'From:sean.ryan@aceville.co.uk';
 
-    $mysqli = connect();
-
-    if($mysqli->connect_error) {
-        die("Error Occured - Connection failed: " . $mysqli->connect_error);
-    }
-
-    //check our key matches a key & email combination in the confirm db
-    $db_key = mysql_query("SELECT * FROM `confirmation` WHERE `user_email` = '$email' AND `confirm` = '$key' LIMIT 1") or die(mysql_error());
-
-    if(mysql_num_rows($db_key) != 0) {
-        $row = $db_key->fetch_assoc();
-
-        $statement = $mysqli->prepare("INSERT INTO 'capture_data' (user_firstname, user_surname, user_email) VALUES (?, ?, ?);");
-        $statement->bind_param('sss', $name, $surname, $email);
-
-        if($statement->execute()) {
-            //success
-            print "success";
-
-             //User is confirmed so delete the confirm row for their email/key pair
-            $delete = mysql_query("DELETE FROM `confirmation` WHERE `user_email` = '$email' AND `confirm` = '$key'");
-        } else {
-            print $mysqli->error;
-        }
+    if(mail($email, $mail_subject, $mail_msg, $mail_headers)) {
+        $_SESSION["RESPONSE"] = "register-success";
+        header('Location: /ee/');
+    } else {
+        error_msg("Failed to send email.");
     }
 }
 
@@ -108,7 +98,7 @@ function connect() {
     }
 
     if($connection == false) {
-        print mysqli_connect_error(); 
+        error_msg("Database Error: " . $mysqli->connect_error);
     }
 
     return $connection;

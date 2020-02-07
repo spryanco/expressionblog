@@ -5,13 +5,15 @@ if(empty($_GET['email']) || empty($_GET['key'])) {
     die();
 }
 
+session_start();
+
 $mysqli = connect();
 
 $email = filter_var($_GET["email"], FILTER_SANITIZE_STRING);
 $key = filter_var($_GET["key"], FILTER_SANITIZE_STRING);
 
 if($mysqli->connect_error) {
-    die("Error Occured - Connection failed: " . $mysqli->connect_error);
+    error_msg("Error Occured - Connection failed: " . $mysqli->connect_error);
 }
 
 //check our key matches a key & email combination in the confirm db
@@ -26,15 +28,22 @@ if($db_key->num_rows != 0) {
 
     if($statement->execute()) {
         //success
-        print "success you have been added";
+        $_SESSION["RESPONSE"] = "confirm-success";
+        header('Location: /ee/');
 
-            //User is confirmed so delete the confirm row for their email/key pair
+        //User is confirmed so delete the confirm row for their email/key pair
         $delete = $mysqli->query("DELETE FROM `confirmation` WHERE `user_email` = '$email' AND `confirm` = '$key'");
     } else {
-        print $mysqli->error;
+        error_msg("Database Error: " . $mysqli->error);
     }
 }
 
+function error_msg($msg) {
+    $_SESSION["RESPONSE"] = "register-failed";
+    $_SESSION["ERROR_MSG"] = $msg;
+    header('Location: /ee/');
+    die();
+}
 
 function connect() {
     static $connection;
@@ -46,7 +55,7 @@ function connect() {
     }
 
     if($connection == false) {
-        print mysqli_connect_error(); 
+        error_msg("Database Error: " .$mysqli->connect_error);
     }
 
     return $connection;
