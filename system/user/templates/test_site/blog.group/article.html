@@ -1,27 +1,23 @@
-{embed="site/_header"}
-<body>
-    <main>
-        <section class="jumbotron jumbotron-fluid text-center">
-            <h1 class="text-center font-weight-light">Simple Expression Engine Blog</h1>
-        </section>
-        <div class="container mt-1 mb-5">
-            <br>
-            {exp:channel:entries channel="blog" limit="1"}
-                <div class="card mt-3">
-                    <div class="card-header">
-                        <a href="blog/{url_title}"><h3>{title}</h3></a>
-                    </div>
-                    <div class="card-body">
-                        {exp:excerpt words="100"}
-                            {post}
-                        {/exp:excerpt}
-                        <br>
-                    <a href="blog/{url_title}" class="btn btn-primary mt-3">Read More</a>
-                    </div>
+{layout="site/_main-layout"}
+<main>
+    <div class="container mt-1 mb-5">
+        <br>
+        {exp:channel:entries channel="blog" limit="1"}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <a href="blog/{url_title}"><h3>{title}</h3></a>
                 </div>
-            {/exp:channel:entries}
-        </div>
-    </main>
-    {embed="site/_footer"}
-</body>
+                <div class="card-body">
+                    {exp:excerpt words="100"}
+                        {post}
+                    {/exp:excerpt}
+                    <br>
+                <a href="blog/{url_title}" class="btn btn-primary mt-3">Read More</a>
+                </div>
+            </div>
+        {/exp:channel:entries}
+    </div>
+</main>
+
+
 
